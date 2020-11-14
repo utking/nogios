@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h3 class="title is-4">Groups</h3>
+
+    {% if items %}
+        <table class="table is-fullwidth">
+        <thead>
+            <tr>
+                <th class="id-col">#</th>
+                <th class="name-col">Name</th>
+                <th>Members</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in items %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>
+                    <a href="/contacts/group/{{ item.name }}" class="is-link">{{ item.name }}</a>
+                </td>
+                <td>
+                    {% for member in item.config.members %}
+                        <a class="is-link tag" href="/contacts/user/{{ member }}">{{ member }}</a>
+                    {% endfor %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        </table>
+    {% endif %}
+{% endblock %}
+
+{% block custom_css %}
+    <style>
+        table th.id-col {
+            width: 3em;
+        }
+        table th.name-col {
+            min-width: 8em;
+            width: 8em;
+            max-width: 16em;
+        }
+    </style>
+{% endblock %}

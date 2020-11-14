@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h3 class="title is-4">Service details</h3>
+
+    {% if item %}
+        <article class="panel is-primary">
+          <p class="panel-heading">
+              {{ item.name }}
+          </p>
+
+          <p class="panel-block">
+            <span class="panel-icon">
+              <i class="fas fa-book" aria-hidden="true"></i>
+            </span>
+            Type: <a class="is-link tag"
+                     href="/services/type/{{ item.type }}">{{ item.type }}</a>
+          </p>
+
+          <p class="panel-block">
+            <span class="panel-icon">
+              <i class="fas fa-book" aria-hidden="true"></i>
+            </span>
+            Check command: <span class="tag is-medium">{{ item.command }} {% if item.command_arguments %}{{ item.command_arguments | join:' ' }}{% endif %}</span>
+          </p>
+
+          <p class="panel-block">
+            <span class="panel-icon">
+              <i class="fas fa-book" aria-hidden="true"></i>
+            </span>
+            Hosts:
+              {% if item.hosts != '' %}
+              <a class="is-link tag"
+                      href="/services/hosts/{{ item.id }}">{{ item.hosts }}</a>
+              {% endif %}
+          </p>
+
+          <p class="panel-block">
+            <span class="panel-icon">
+              <i class="fas fa-book" aria-hidden="true"></i>
+            </span>
+            Exclude hosts:
+              {% if item.excluded_hosts != '' %}
+              <a class="is-link tag"
+                      href="/services/hosts/{{ item.id }}">{{ item.excluded_hosts }}</a>
+              {% endif %}
+          </p>
+
+          <p class="panel-block">
+            <span class="panel-icon">
+              <i class="fas fa-location-arrow" aria-hidden="true"></i>
+            </span>
+            Location:
+              <a class="is-link tag" href="/services/location/{{ item.location }}">{{ item.location }}</a>
+          </p>
+
+          <p class="panel-block">
+            <span class="panel-icon">
+              <i class="fas fa-tags" aria-hidden="true"></i>
+            </span>
+            Tags:
+              {% if item.config.tags %}
+                  {%  for tag in item.config.tags %}
+                      <span class="tag is-warning" >{{ tag }}</span>
+                  {% endfor %}
+              {% endif %}
+          </p>
+
+          {% if item.config.time_period %}
+              <p class="panel-block">
+                <span class="panel-icon has-text-info">
+                  <i class="fas fa-clock" aria-hidden="true"></i>
+                </span>
+                Notification time period: <a class="tag"
+                         href="/time_periods/view/{{ item.config.time_period }}">{{ item.config.time_period }}</a>
+              </p>
+          {% endif %}
+
+          <p class="panel-block">
+            <span class="panel-icon">
+              <i class="fas fa-users" aria-hidden="true"></i>
+            </span>
+            Contacts:
+              {% for user in item.config.contacts.users %}
+                  <a class="is-primary tag" href="/contacts/user/{{ user }}">{{ user }}</a>
+              {% endfor %}
+              {% for group in item.config.contacts.groups %}
+                  <a class="is-info tag" href="/contacts/group/{{ group }}">{{ group }}</a>
+              {% endfor %}
+          </p>
+
+          {% if item.config.help_url %}
+              <p class="panel-block">
+                <span class="panel-icon has-text-info">
+                  <i class="fas fa-info-circle" aria-hidden="true"></i>
+                </span>
+                Help: <a class="tag" target="_blank"
+                         href="{{ item.config.help_url }}">{{ item.config.help_url }}</a>
+              </p>
+          {% endif %}
+
+          {% if item.config.action_url %}
+              <p class="panel-block">
+                <span class="panel-icon has-text-info">
+                  <i class="fas fa-question-circle" aria-hidden="true"></i>
+                </span>
+                Action: <a class="tag" target="_blank"
+                         href="{{ item.config.action_url }}">{{ item.config.action_url }}</a>
+              </p>
+          {% endif %}
+
+          {% if item.config.monitoring_url %}
+              <p class="panel-block">
+                <span class="panel-icon has-text-info">
+                  <i class="fas fa-poll" aria-hidden="true"></i>
+                </span>
+                Monitoring: <a class="tag" target="_blank"
+                         href="{{ item.config.monitoring_url }}">{{ item.config.monitoring_url }}</a>
+              </p>
+          {% endif %}
+
+          <p class="panel-block">
+            <span class="panel-icon">
+              <i class="fas fa-list" aria-hidden="true"></i>
+            </span>
+            Config:
+          </p>
+
+          <pre>{{ config }}</pre>
+
+        </article>
+    {% endif %}
+{% endblock %}
+
+{% block custom_css %}
+    <style>
+    article .tag {
+        margin-left: 1em;
+    }
+    </style>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h3 class="title is-4">Users</h3>
+
+    {% if items %}
+        <table class="table is-fullwidth">
+        <thead>
+            <tr>
+                <th class="id-col">#</th>
+                <th>Name</th>
+                <th>Channel</th>
+                <th>Destination</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in items %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>
+                    <a href="/contacts/user/{{ item.name }}" class="is-link">{{ item.name }}</a>
+                </td>
+                <td>
+                    {{ item.channel }}
+                </td>
+                <td>
+                    <a class="is-link">{{ item.destination }}</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        </table>
+    {% endif %}
+{% endblock %}
+
+{% block custom_css %}
+    <style>
+        table th.id-col {
+            width: 3em;
+        }
+    </style>
+{% endblock %}

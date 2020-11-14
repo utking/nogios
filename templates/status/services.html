@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h3 class="title is-4">Service status{% if host_name %} for {{ host_name }} (<a href="/status/services">all services</a>){% endif %}</h3>
+
+    {% if items %}
+        <table class="table is-fullwidth is-bordered">
+        <thead>
+            <tr class="is-selected">
+                <th>Host</th>
+                <th>Service</th>
+                <th>Attempts</th>
+                <th class="status-col">Status</th>
+                <th>Status information</th>
+                <th class="datetime-col">Duration</th>
+                <th class="datetime-col">Last check</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for name, services in items.items %}
+            <tr>
+                <td rowspan="{{ services | length }}">
+                    <a href="/status/host-services/{{ name }}">{{ name }}</a>
+                </td>
+                {% for service in services %}
+                <td>
+                    <a href="/status/service/{{ name }}/{{ service.name }}">{{ service.name }}</a>
+                    {% if service.ack %}
+                        <a href="#">
+                          <span class="panel-icon ack-icon" title="Acknowledged">
+                            <i class="fas fa-comment-slash" aria-hidden="true"></i>
+                          </span>
+                        </a>
+                    {% endif %}
+                    {% if service.down %}
+                        <a href="#">
+                          <span class="panel-icon down-icon" title="Maintenance">
+                            <i class="fas fa-tools" aria-hidden="true"></i>
+                          </span>
+                        </a>
+                    {% endif %}
+                    {% if service.config.help_url %}
+                        <a target="_blank" href="{{ service.config.help_url }}" title="Help URL">
+                          <span class="panel-icon has-text-info">
+                            <i class="fas fa-info-circle" aria-hidden="true"></i>
+                          </span>
+                        </a>
+                    {% endif %}
+                    {% if service.config.action_url %}
+                        <a target="_blank" href="{{ service.config.action_url }}" title="Action URL">
+                          <span class="panel-icon has-text-info">
+                            <i class="fas fa-question-circle" aria-hidden="true"></i>
+                          </span>
+                        </a>
+                    {% endif %}
+                    {% if service.config.monitoring_url %}
+                        <a target="_blank" href="{{ service.config.monitoring_url }}" title="Monitoring URL">
+                          <span class="panel-icon has-text-info">
+                            <i class="fas fa-poll" aria-hidden="true"></i>
+                          </span>
+                        </a>
+                    {% endif %}
+                </td>
+                <td class="col-hard-status-{{ service.hard_status }}">
+                {% if service.attempts > 0 %}{{ service.attempts }}/{{ service.retry_attempts }}{% endif %}
+                </td>
+                <td class="col-status-{{ service.current_status_id }}">
+                    {{ service.current_status_id }}
+                    {% if service.down or service.ack %}
+                        <span class="icon is-medium" title="on pause">
+                          <i title="on pause" class="fas fa-pause-circle" aria-hidden="true"></i>
+                        </span>
+                    {% endif %}
+                </td>
+                <td>
+                    <span title="{{ service.output.strip }}">{{ service.output.strip | truncatechars:64 }}</span>
+                </td>
+                <td>
+                    {% if service.failing_since %}
+                    {{ service.failing_since |timesince }}
+                    {% endif %}
+                </td>
+                <td>{{ service.executed_at | date:"Y-m-d H:i:s" }}</td>
+            </tr>
+                {% endfor %}
+        {% endfor %}
+        </tbody>
+        </table>
+    {% endif %}
+{% endblock %}
+
+{% block custom_css %}
+    <style>
+        table th.id-col {
+            width: 3em;
+        }
+        table tr td.col-status-OK {
+            /* background: #7FFF00; */
+        }
+        table tr td.col-status-WARNING {
+            background: #fc994c;
+        }
+        table tr td.col-status-CRITICAL {
+            background: #f87a7a;
+        }
+        table tr td.col-status-BLOCKER {
+            background: #e90d0d;
+        }
+        table tr td.col-hard-status-True {
+            color: #e90d0d;
+            font-weight: bold;
+        }
+        table tr td.col-status-PENDING,
+        table tr td.col-status-UNKNOWN {
+            background: #b0abab;
+        }
+
+        .panel-icon {
+            margin-right: 0;
+        }
+
+        table tr th.datetime-col {
+            width: 12em;
+        }
+        table tr th.status-col {
+            width: 10em;
+        }
+
+    </style>
+{% endblock %}

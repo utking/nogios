@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h3 class="title is-4">Hosts</h3>
+
+    {% if items %}
+        <table class="table is-fullwidth">
+        <thead>
+            <tr class="is-selected">
+                <th class="id-col">#</th>
+                <th>Name</th>
+                <th>IP</th>
+                <th>Location</th>
+                <th>Contacts</th>
+                <th>Tags</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in items %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>
+                    <a href="/hosts/view/{{ item.host_name }}" class="is-link">{{ item.host_name }}</a>
+                </td>
+                <td>{{ item.address }}</td>
+                <td>
+                    <a href="/hosts/location/{{ item.location }}" class="is-link">{{ item.location }}</a>
+                </td>
+                <td>
+                    {%  for user in item.config.contacts.users %}
+                        <a class="tag is-primary" href="/contacts/user/{{ user }}">{{ user }}</a>
+                    {% endfor %}
+                    {%  for group in item.config.contacts.groups %}
+                        <a class="tag is-info" href="/contacts/group/{{ group }}">{{ group }}</a>
+                    {% endfor %}
+                </td>
+                <td>
+                    {% if item.config.tags %}
+                        {%  for tag in item.config.tags %}
+                            <span class="tag is-warning" >{{ tag }}</span>
+                        {% endfor %}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        </table>
+    {% endif %}
+{% endblock %}
+
+{% block custom_css %}
+    <style>
+        table th.id-col {
+            width: 3em;
+        }
+    </style>
+{% endblock %}

@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h3 class="title is-4">
+        <a href="/status/host-services/{{ host_name }}">{{ host_name }}</a> history (<a
+            href="/status/hosts">all hosts</a>)</h3>
+
+    <div class="field is-grouped">
+      <p class="control">
+        <form id="ack" action="/status/host/ack" method="post">
+            <input type="hidden" id="host_name" name="host_name" value="{{ host_name }}">
+            <button class="button is-{% if ack %}primary{% else %}info{% endif %}" id="ack-button">
+              <span class="icon is-small">
+                <i class="fas fa-{% if ack %}comment{% else %}comment-slash{% endif %}"></i>
+              </span>
+              <span>{% if ack %}Un-ack{% else %}Ack{% endif %}</span>
+            </button>
+        </form>
+      </p>
+      <p class="control">
+        <form id="down" action="/status/host/down" method="post" >
+            <input type="hidden" id="host_name" name="host_name" value="{{ host_name }}">
+            <div class="field is-grouped">
+                <p class="control">
+                    <button class="button is-{% if down %}primary{% else %}info{% endif %}" id="ack-button">
+                      <span class="icon is-small">
+                        <i class="fas fa-{% if down %}comment{% else %}tools{% endif %}"></i>
+                      </span>
+                      <span>{% if down %}Un-Maint{% else %}Maint{% endif %}</span>
+                    </button>
+                </p>
+                {% if down == none %}
+                <p class="control">
+                    <input type="datetime-local" class="input" id="started_at" name="started_at" title="From">
+                </p>
+                <p class="control">
+                    <input type="datetime-local" class="input" id="expire_at" name="expire_at" title="To">
+                </p>
+                <p class="control">
+                    <input type="text" class="input" id="info" name="info" placeholder="Comment">
+                </p>
+                {% else %}
+                    <input type="hidden" id="expire_at" name="started_at">
+                    <input type="hidden" id="expire_at" name="expire_at">
+                    <p class="control">
+                        <input type="text" disabled="disabled" class="input"
+                               title="From {{ down.started_at }} to {{ down.expires_at }}"
+                               value="From {{ down.started_at }} to {{ down.expires_at }}">
+                    </p>
+                    <p class="control">
+                        <input type="text" disabled="disabled" class="input" id="info" name="info"
+                               value="{{ down.info }}">
+                    </p>
+                {% endif %}
+            </div>
+        </form>
+      </p>
+    </div>
+
+    {% if items %}
+        <table class="table is-fullwidth is-bordered">
+        <thead>
+            <tr class="is-selected">
+                <th class="id-col">#</th>
+                <th>Output</th>
+                <th class="status-col">Status</th>
+                <th class="datetime-col">Check Date/Time</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in items %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ item.output }}</td>
+                <td class="col-status-{{ item.status_id }}">{{ item.status_id }}</td>
+                <td>{{ item.created_at | date:"Y-m-d H:i:s" }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        </table>
+    {% endif %}
+{% endblock %}
+
+{% block custom_css %}
+    <style>
+        table th.id-col {
+            width: 3em;
+        }
+        table tr td.col-status-UP {
+            /* background: #7FFF00; */
+        }
+        table tr td.col-status-DOWN {
+            background: #f87a7a;
+        }
+        table tr td.col-hard-status-True {
+            color: #e90d0d;
+            font-weight: bold;
+        }
+        table tr td.col-status-PENDING,
+        table tr td.col-status-UNKNOWN {
+            background: #b0abab;
+        }
+
+        table tr th.datetime-col {
+            width: 12em;
+        }
+        table tr th.status-col {
+            width: 10em;
+        }
+        {% if down == none %}
+        form#down {
+            border: 1px solid gray;
+            border-radius: 5px;
+        }
+        {% endif %}
+    </style>
+{% endblock %}

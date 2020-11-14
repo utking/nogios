@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h3 class="title is-4">Service statuses</h3>
+
+    {% if items %}
+        <table class="table is-fullwidth">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Alias</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in items %}
+            <tr>
+                <td>{{ item.name }}</td>
+                <td>{{ item.alias }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        </table>
+    {% endif %}
+{% endblock %}

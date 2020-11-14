@@ -1,0 +1,24 @@
+- model: services.ServiceStatus
+  pk: 'UNKNOWN'
+  fields:
+    alias: 'Unknown'
+- model: services.ServiceStatus
+  pk: 'PENDING'
+  fields:
+    alias: 'Pending'
+- model: services.ServiceStatus
+  pk: 'OK'
+  fields:
+    alias: 'Ok'
+- model: services.ServiceStatus
+  pk: 'CRITICAL'
+  fields:
+    alias: 'Critical'
+- model: services.ServiceStatus
+  pk: 'BLOCKER'
+  fields:
+    alias: 'Blocker'
+- model: services.ServiceStatus
+  pk: 'WARNING'
+  fields:
+    alias: 'Warning'

@@ -1,0 +1,16 @@
+- model: hosts.hoststatus
+  pk: 'UNKNOWN'
+  fields:
+    alias: 'Unknown'
+- model: hosts.hoststatus
+  pk: 'PENDING'
+  fields:
+    alias: 'Pending'
+- model: hosts.hoststatus
+  pk: 'UP'
+  fields:
+    alias: 'Up'
+- model: hosts.hoststatus
+  pk: 'DOWN'
+  fields:
+    alias: 'Down'

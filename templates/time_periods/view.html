@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h3 class="title is-4">{{ title }}</h3>
+
+    {% if item %}
+        <article class="panel is-primary">
+          <p class="panel-heading">
+              {{ item.name }}
+          </p>
+
+          <div class="panel-block">
+            <span class="panel-icon">
+              <i class="fas fa-book" aria-hidden="true"></i>
+            </span>
+            Alias:
+              <span class="tag is-medium">{{ item.alias }}</span>
+          </div>
+
+          <p class="panel-block">
+            <span class="panel-icon">
+              <i class="fas fa-book" aria-hidden="true"></i>
+            </span>
+            Config: <pre>{{ config }}</pre>
+          </p>
+        </article>
+    {% endif %}
+{% endblock %}
+
+{% block custom_css %}
+    <style>
+    article .tag {
+        margin-left: 1em;
+    }
+    </style>
+{% endblock %}

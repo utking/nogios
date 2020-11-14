@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h3 class="title is-4">Host status{% if host_name %} for {{ host_name }} (<a href="/status/hosts">all hosts</a>){% endif %}</h3>
+
+    {% if items %}
+        <table class="table is-fullwidth is-bordered">
+        <thead>
+            <tr class="is-selected">
+                <th>Host</th>
+                <th>Attempts</th>
+                <th class="status-col">Status</th>
+                <th>Output</th>
+                <th class="datetime-col">Check Date/Time</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in items %}
+            <tr>
+                <td><a href="/status/host/{{ item.host_name }}">
+                    {{ item.host_name }}
+                    {% if item.ack %}
+                        <a href="#">
+                          <span class="panel-icon ack-icon" title="Acknowledged">
+                            <i class="fas fa-comment-slash" aria-hidden="true"></i>
+                          </span>
+                        </a>
+                    {% endif %}
+                    {% if item.down %}
+                        <a href="#">
+                          <span class="panel-icon down-icon" title="Maintenance">
+                            <i class="fas fa-tools" aria-hidden="true"></i>
+                          </span>
+                        </a>
+                    {% endif %}
+                    {% if item.config.help_url %}
+                        <a target="_blank" href="{{ item.config.help_url }}" title="Help URL">
+                          <span class="panel-icon has-text-info">
+                            <i class="fas fa-info-circle" aria-hidden="true"></i>
+                          </span>
+                        </a>
+                    {% endif %}
+                    {% if item.config.action_url %}
+                        <a target="_blank" href="{{ item.config.action_url }}" title="Action URL">
+                          <span class="panel-icon has-text-info">
+                            <i class="fas fa-question-circle" aria-hidden="true"></i>
+                          </span>
+                        </a>
+                    {% endif %}
+                    {% if item.config.monitoring_url %}
+                        <a target="_blank" href="{{ item.config.monitoring_url }}" title="Monitoring URL">
+                          <span class="panel-icon has-text-info">
+                            <i class="fas fa-poll" aria-hidden="true"></i>
+                          </span>
+                        </a>
+                    {% endif %}
+                </a></td>
+                <td class="col-hard-status-{{ item.hard_status }}">
+                {% if item.attempts > 0 %}{{ item.attempts }}/{{ item.retry_attempts }}{% endif %}
+                </td>
+                <td class="col-status-{{ item.current_status_id }}">
+                    {{ item.current_status_id }}
+                    {% if item.down or item.ack %}
+                        <span class="icon is-medium" title="on pause">
+                          <i title="on pause" class="fas fa-pause-circle" aria-hidden="true"></i>
+                        </span>
+                    {% endif %}
+                </td>
+                <td>
+                    <span title="{{ item.output }}">{{ item.output | truncatechars:64 }}</span>
+                </td>
+                <td>{{ item.executed_at | date:"Y-m-d H:i:s" }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        </table>
+    {% endif %}
+{% endblock %}
+
+{% block custom_css %}
+    <style>
+        table th.id-col {
+            width: 3em;
+        }
+        table tr td.col-status-UP {
+            /* background: #7FFF00; */
+        }
+        table tr td.col-status-DOWN {
+            background: #f87a7a;
+        }
+        table tr td.col-hard-status-True {
+            color: #e90d0d;
+            font-weight: bold;
+        }
+        table tr td.col-status-PENDING,
+        table tr td.col-status-UNKNOWN {
+            background: #b0abab;
+        }
+        table tr th.datetime-col {
+            width: 12em;
+        }
+        table tr th.status-col {
+            width: 10em;
+        }
+        .panel-icon {
+            margin-right: 0;
+        }
+    </style>
+{% endblock %}

@@ -1,0 +1,36 @@
+version: "3"
+
+services:
+  mysql:
+    image: library/percona:5.7-centos
+    ports:
+    - "3306:3306"
+    environment:
+      MYSQL_DATABASE: nogios
+      MYSQL_USER: nogios
+      MYSQL_PASSWORD: nogios
+      MYSQL_ROOT_PASSWORD: secret
+    networks:
+      - nogios
+  mailcatcher:
+    image: schickling/mailcatcher
+    ports:
+    - "1025:1025"
+    - "1080:1080"
+    networks:
+      - nogios
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+    - "5672:5672"
+    - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbitmq
+      RABBITMQ_DEFAULT_PASS: rabbitmq
+      RABBITMQ_DEFAULT_VHOST: nogios
+    networks:
+      - nogios
+
+networks:
+  nogios:
+    driver: bridge

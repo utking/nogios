@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h3 class="title is-4">
+        <a href="/status/host-services/{{ host_name }}">{{ host_name }}</a>::{{ name }} status history</h3>
+
+    <div class="field is-grouped">
+      <p class="control">
+        <form id="props" action="/status/service/ack" method="post">
+            <input type="hidden" id="host_name" name="host_name" value="{{ host_name }}">
+            <input type="hidden" id="name" name="name" value="{{ name }}">
+            <button class="button is-{% if ack %}primary{% else %}info{% endif %}" id="ack-button">
+              <span class="icon is-small">
+                <i class="fas fa-{% if ack %}comment{% else %}comment-slash{% endif %}"></i>
+              </span>
+              <span>{% if ack %}Un-ack{% else %}Ack{% endif %}</span>
+            </button>
+        </form>
+      </p>
+      <p class="control">
+        <form id="down" action="/status/service/down" method="post" >
+            <input type="hidden" id="host_name" name="host_name" value="{{ host_name }}">
+            <input type="hidden" id="name" name="name" value="{{ name }}">
+            <div class="field is-grouped">
+                <p class="control">
+                    <button class="button is-{% if down %}primary{% else %}info{% endif %}" id="ack-button">
+                      <span class="icon is-small">
+                        <i class="fas fa-{% if down %}comment{% else %}tools{% endif %}"></i>
+                      </span>
+                      <span>{% if down %}Un-Maint{% else %}Maint{% endif %}</span>
+                    </button>
+                </p>
+                {% if down == none %}
+                <p class="control">
+                    <input title="From" type="datetime-local" class="input" id="started_at" name="started_at">
+                </p>
+                <p class="control">
+                    <input title="To" type="datetime-local" class="input" id="expire_at" name="expire_at">
+                </p>
+                <p class="control">
+                    <input type="text" class="input" id="info" name="info" placeholder="Comment">
+                </p>
+                {% else %}
+                    <input type="hidden" id="expire_at" name="expire_at">
+                    <input type="hidden" id="started_at" name="started_at">
+                    <p class="control">
+                        <input type="text" disabled="disabled" class="input"
+                               title="From {{ down.started_at }} to {{ down.expires_at }}"
+                               value="From {{ down.started_at }} to {{ down.expires_at }}">
+                    </p>
+                    <p class="control">
+                        <input type="text" disabled="disabled" class="input" id="info" name="info"
+                               value="{{ down.info }}">
+                    </p>
+                {% endif %}
+            </div>
+        </form>
+      </p>
+    </div>
+
+    {% if items %}
+        <table class="table is-fullwidth is-bordered">
+        <thead>
+            <tr class="is-selected">
+                <th class="id-col">#</th>
+                <th>Status information</th>
+                <th class="ret-code-col">Ret. code</th>
+                <th class="status-col">Status</th>
+                <th class="datetime-col">Check Date/Time</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in items %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ item.output }}</td>
+                <td>{{ item.ret_code }}</td>
+                <td class="col-status-{{ item.status_id }}">{{ item.status_id }}</td>
+                <td>{{ item.created_at | date:"Y-m-d H:i:s" }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        </table>
+    {% endif %}
+{% endblock %}
+
+{% block custom_css %}
+    <style>
+        table th.id-col {
+            width: 3em;
+        }
+        table tr td.col-status-WARNING {
+            background: #fc994c;
+        }
+        table tr td.col-status-CRITICAL {
+            background: #f87a7a;
+        }
+        table tr td.col-status-BLOCKER {
+            background: #e90d0d;
+        }
+        table tr td.col-hard-status-True {
+            color: #e90d0d;
+            font-weight: bold;
+        }
+        table tr th.datetime-col {
+            width: 12em;
+        }
+        table tr th.ret-code-col {
+            width: 8em;
+        }
+        table tr th.status-col {
+            width: 10em;
+        }
+        table tr td.col-status-PENDING,
+        table tr td.col-status-UNKNOWN {
+            background: #b0abab;
+        }
+    </style>
+{% endblock %}
