@@ -1,6 +1,7 @@
 services:
   - name: 'check_ssh'
-    type: 'ssh'
+    type: 'telnet'
+    channel: LocalShell
     hosts: '.*'
     excluded_hosts: '^(win-.*|srv-dev-01.local.domain)'
     command: check_ssh

@@ -11,8 +11,8 @@ commands:
     alias: 'Load average'
     cmd: 'cat /proc/loadavg | cut -f1-3 -d" "'
   - name: 'check_ssh'
-    alias: 'Check port 22'
-    cmd: 'bash -c "if [[ $(( $RANDOM % 2 )) == 0 ]];  then exit 0; else exit $(( $RANDOM % 4 )); fi"'
+    alias: 'Check SSH, port 22'
+    cmd: "echo -e '\x1dclose\x0d' | telnet $HOST$ 22"
   - name: 'check_http_resp_code'
     alias: 'Check HTTP resp code'
     cmd: 'curl -s -o /dev/null -w "%{http_code}" '
