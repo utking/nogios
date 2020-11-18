@@ -15,6 +15,9 @@ class GenericCommandsHelper(object):
     def __init__(self):
         super().__init__()
 
+    def runs_multiple(self):
+        return False
+
     @staticmethod
     def prepare_command_object(command=None):
         if isinstance(command, str):

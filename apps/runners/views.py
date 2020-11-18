@@ -33,10 +33,12 @@ def __service_check_thread(host_name: str, host_ip: str, command: dict, channel_
         if isinstance(command, dict):
             ok, resp = channel.send(host_ip, command=command)
             process_response(ok=ok, resp=resp)
-        else:
+        elif isinstance(command, list) and channel.runs_multiple():
             responses = channel.send_multiple(host_ip, commands=command)
             for (ok, resp) in responses:
                 process_response(ok=ok, resp=resp)
+        else:
+            raise Exception('Unsupported channel [{}] configuration for services on {}'.format(channel_name, host_name))
     except Exception as e:
         raise Exception('Error {}'.format(str(e)))
 
@@ -95,12 +97,13 @@ def __check_services(check_interval: int):
             host = HostConfig.objects.get_item(host_name=service.host_name)
             command = CommandConfig.objects.get_item(name=service.command)
             service_channel = ServiceConfig.objects.get_channel(service.name)
+            channel = CommandChannelFactory.get_channel(service_channel)
             if host is None:
                 raise Exception('FAIL: Host {} not found'.format(service.host_name))
             if command is None:
                 raise Exception('FAIL: Command {} not found'.format(service.command))
 
-            if service_channel == 'Ssh':
+            if channel.runs_multiple():
                 if services_over_ssh.get(service.host_name) is None:
                     services_over_ssh[service.host_name] = {
                         'host': host,

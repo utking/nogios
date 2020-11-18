@@ -11,6 +11,9 @@ class SshCommandsHelper(GenericCommandsHelper):
         super().__init__()
         self.DEST_PORT = port
 
+    def runs_multiple(self):
+        return True
+
     def send(self, host_addr: str, command: dict, port=None, user='root'):
         ssh_port = self.DEST_PORT
         if port is not None:
