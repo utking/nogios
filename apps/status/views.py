@@ -1,3 +1,5 @@
+from struct import pack
+
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.forms.models import model_to_dict
@@ -304,6 +306,27 @@ def host_ack(request):
             ServiceAck.objects.remove_item(host_name=host_name, name='host')
 
     return redirect('/status/host/{}'.format(host_name))
+
+
+@csrf_exempt
+@require_http_methods(['POST'])
+def host_ack_json(request):
+    params = loads(request.body)
+    host_name = params.get('host_name', None)
+    host = HostConfig.objects.get_item(host_name=host_name)
+
+    if host is not None:
+        ack = ServiceAck.objects.get_item(host_name=host_name, name='host')
+        if ack is None:
+            ack = ServiceAck(name='host', host_name=host_name)
+            ack.save()
+            if ack.pk > 0:
+                return JsonResponse({'ack': True})
+        else:
+            ServiceAck.objects.remove_item(host_name=host_name, name='host')
+            return JsonResponse({'ack': False})
+
+    return JsonResponse({'ack': False})
 
 
 @csrf_exempt
