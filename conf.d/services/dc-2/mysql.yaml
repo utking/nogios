@@ -6,4 +6,4 @@ services:
     location: dc-3
     contacts:
       users:
-      - 'admin.user'
+      - 'user.admin'
