@@ -1,0 +1,18 @@
+language: python
+python:
+  - "3.4"
+  - "3.5"
+  - "3.6"
+  - "3.7"
+  - "3.8"
+install:
+  - apt install sqlite
+  - pip install -r requirements.txt
+# command to run tests
+script:
+  - cp nogios/settings.example.py nogios/settings.py
+  - python3 manage.py check
+  - python3 manage.py test -v 2
+  - python3 manage.py migrate
+  - python3 manage.py loaddata fixtures/*
+  - python3 manage.py verify
