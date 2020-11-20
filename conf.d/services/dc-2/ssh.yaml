@@ -20,7 +20,7 @@ services:
       - 2
     contacts:
       users:
-        - admin.user
+        - user.admin
   - name: 'check_load'
     type: 'tcp'
     hosts: '^srv-dev-001.local.domain$'
