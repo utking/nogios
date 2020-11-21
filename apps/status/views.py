@@ -448,8 +448,50 @@ def host_down(request):
     return redirect('/status/host/{}'.format(host_name))
 
 
+@csrf_exempt
+@require_http_methods(['POST'])
+def host_down_json(request):
+    params = loads(request.body)
+    host_name = params.get('host_name', None)
+    expires_at = params.get('expires_at', None)
+    started_at = params.get('started_at', None)
+    info = params.get('info', '')[:128]
+    host = HostConfig.objects.get_item(host_name=host_name)
+
+    try:
+        dt_start = datetime.strptime(started_at, '%Y-%m-%dT%H:%M')
+    except:
+        dt_start = datetime.now()
+
+    try:
+        dt = datetime.strptime(expires_at, '%Y-%m-%dT%H:%M')
+        if (datetime.now() - dt).total_seconds() > 0:
+            return JsonResponse({'down': False, 'error': 'Downtime end is in the past'})
+    except Exception as e:
+        dt = None
+
+    if host is not None and expires_at is not None:
+        down = ServiceDowntime.objects.get_item(host_name=host_name, name='host')
+        if down is None:
+            if dt is not None:
+                down = ServiceDowntime(name='host', host_name=host_name, info=info,
+                                       started_at=dt_start, expires_at=dt)
+                try:
+                    down.save()
+                    if down.pk > 0:
+                        return JsonResponse({'down': True})
+                except Exception as e:
+                    return JsonResponse({'down': False, 'error': str(e)})
+                    pass
+        else:
+            ServiceDowntime.objects.remove_item(host_name=host_name, name='host')
+            return JsonResponse({'down': True})
+
+    return JsonResponse({'down': False, 'host': host is None, 'expire_at': expires_at is None})
+
+
 def host(request, host_name: str):
-    items = HostStatusHistory.objects.filter(host_name=host_name).all() # [:15]
+    items = HostStatusHistory.objects.filter(host_name=host_name).all()
     ack = ServiceAck.objects.get_item(host_name=host_name, name='host')
     down = ServiceDowntime.objects.get_item(host_name=host_name, name='host')
 
@@ -463,7 +505,7 @@ def host(request, host_name: str):
 
 
 def host_json(request, host_name: str):
-    history_items = HostStatusHistory.objects.filter(host_name=host_name).all() # [:15]
+    history_items = HostStatusHistory.objects.filter(host_name=host_name).all()
     ack = ServiceAck.objects.get_item(host_name=host_name, name='host')
     down = ServiceDowntime.objects.get_item(host_name=host_name, name='host')
     items = []
@@ -471,10 +513,14 @@ def host_json(request, host_name: str):
         item = model_to_dict(history_item)
         item['created_at'] = history_item.created_at.strftime('%Y-%m-%d %H:%M:%S')
         items.append(item)
+    if down is None:
+        down = False
+    else:
+        down = model_to_dict(down)
 
     return JsonResponse({
         'items': items,
         'host_name': host_name,
         'ack': ack is not None,
-        'down': down is not None,
+        'down': down,
     })
