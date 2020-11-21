@@ -34,6 +34,7 @@ urlpatterns = [
     path('service/ack', views.service_ack, name='service_ack'),
     path('api/service/ack', views.service_ack_json, name='service_ack_json'),
     path('host/down', views.host_down, name='host_down'),
+    path('api/host/down', views.host_down_json, name='host_down_json'),
     path('host/ack', views.host_ack, name='host_ack'),
     path('api/host/ack', views.host_ack_json, name='host_ack_json'),
     path('host/<str:host_name>', views.host, name='host'),

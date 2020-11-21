@@ -33,6 +33,8 @@ python3 manage.py runserver             # to start a dev server
 cp ./nogios/settings.example.py ./nogios/settings.py    # and adjust what needed to be adjusted
 pip3 install wheel
 pip3 install -r requirements.txt
+python3 manage.py migrate               # to apply DB migrations
+python3 manage.py loaddata fixtures/*   # to load initial data
 python3 manage.py crontab add           # to add a cron job for checks
 python3 manage.py verify                # to check Nogios config files
 python3 manage.py verify --save         # ... to check and load them if there weren no errors
