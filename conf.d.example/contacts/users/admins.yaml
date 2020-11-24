@@ -1,0 +1,10 @@
+users:
+  - name: user.admin
+    destination: user.admin@fake.domain
+    channel: Email
+  - name: jira
+    destination: ''
+    channel: Jira
+  - name: msteams
+    destination: ''
+    channel: MsTeams

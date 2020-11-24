@@ -1,0 +1,9 @@
+services:
+  - name: 'check_replication_lag'
+    type: 'mysql'
+    command: mysql_replication_lag
+    hosts: '.*(mysql).*'
+    location: dc-3
+    contacts:
+      users:
+      - 'user.admin'
