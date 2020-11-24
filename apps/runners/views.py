@@ -16,6 +16,7 @@ from json import loads
 
 def __host_check_thread(host_name, host_ip):
     try:
+        print('Checking {} {}'.format(host_name, host_ip))
         ip, time_min, time_avg, time_max, lost = ping(host_ip)
         status = 'UP' if lost < 100 else 'DOWN'
         output = 'IP {} - avg. time {} ms, lost {}%'.format(ip, time_avg, lost)
@@ -77,6 +78,14 @@ def __check_hosts(check_interval: int):
             print('Error checking host {}; {}'.format(host.host_name, e))
 
 
+def __check_host(host_name: str):
+    for host in HostToRun.objects.filter(host_name=host_name).all():
+        try:
+            _thread.start_new_thread(__host_check_thread, (host.host_name, host.address))
+        except SystemExit as e:
+            print('Error checking host {}; {}'.format(host.host_name, e))
+
+
 def __check_services(check_interval: int):
     now = datetime.now()
     services_over_ssh = {}
@@ -132,6 +141,36 @@ def __check_services(check_interval: int):
         run_combined_checks_over_ssh(services_over_ssh)
 
 
+def __check_service(host_name: str, service_name: str):
+    for service in ServiceToRun.objects.filter(host_name=host_name, name=service_name).all():
+        try:
+            host = HostConfig.objects.get_item(host_name=service.host_name)
+            command = CommandConfig.objects.get_item(name=service.command)
+            if host is None:
+                raise Exception('FAIL: Host {} not found'.format(service.host_name))
+            if command is None:
+                raise Exception('FAIL: Command {} not found'.format(service.command))
+
+            argv = service.command_arguments
+            channel_name = ServiceConfig.objects.get_channel(service_name=service.name)
+
+            print('{} - {}[{}]::{}'.format(channel_name, service.host_name, host.address, service.name))
+
+            _thread.start_new_thread(__service_check_thread,
+                                     (service.host_name,
+                                      host.address,
+                                      {
+                                          'cmd': command.cmd,
+                                          'args': argv,
+                                          'service_name': service.name,
+                                          'host_name': service.host_name,
+                                          'command_name': command.name,
+                                      },
+                                      channel_name))
+        except SystemExit as e:
+            print('Error checking service {}::{}; {}'.format(service.host_name, service.name, e))
+
+
 def run_combined_checks_over_ssh(services_over_ssh: dict):
     for host_name in services_over_ssh.keys():
         host = services_over_ssh.get(host_name)['host']
@@ -168,9 +207,28 @@ def run_checks(request):
     default_check_interval = settings.DEFAULT_CHECK_INTERVAL
     # for every check, pull its schedule and run if it is time
     print('run host checks')
-    __check_hosts(default_check_interval)
+    __check_hosts(check_interval=default_check_interval)
     print('run service checks')
-    __check_services(default_check_interval)
+    __check_services(check_interval=default_check_interval)
+    return JsonResponse({'status': 'Ok', 'datetime': str(datetime.now())})
+
+
+@csrf_exempt
+@require_http_methods(['POST'])
+def run_host_check(request):
+    params = loads(request.body)
+    host_name = params.get('host_name', None)
+    __check_host(host_name=host_name)
+    return JsonResponse({'status': 'Ok', 'datetime': str(datetime.now())})
+
+
+@csrf_exempt
+@require_http_methods(['POST', 'GET'])
+def run_service_check(request):
+    params = loads(request.body)
+    host_name = params.get('host_name', None)
+    service_name = params.get('service_name', None)
+    __check_service(host_name=host_name, service_name=service_name)
     return JsonResponse({'status': 'Ok', 'datetime': str(datetime.now())})
 
 

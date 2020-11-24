@@ -14,6 +14,7 @@
                 <th>Status information</th>
                 <th class="datetime-col">Duration</th>
                 <th class="datetime-col">Last check</th>
+                <th class="action-col">#</th>
             </tr>
         </thead>
         <tbody>
@@ -81,6 +82,14 @@
                     {% endif %}
                 </td>
                 <td>{{ service.executed_at | date:"Y-m-d H:i:s" }}</td>
+                <td>
+                    <a class="refresh-button" data-service-name="{{ service.name }}"
+                       data-host-name="{{ name }}" title="Re-check immediately">
+                        <span>
+                            <i class="fas fa-sync" aria-hidden="true"></i>
+                        </span>
+                    </a>
+                </td>
             </tr>
                 {% endfor %}
         {% endfor %}
@@ -93,6 +102,9 @@
     <style>
         table th.id-col {
             width: 3em;
+        }
+        table th.action-col {
+            width: 2em;
         }
         table tr td.col-status-OK {
             /* background: #7FFF00; */
@@ -128,3 +140,32 @@
 
     </style>
 {% endblock %}
+{% block javascript %}
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+          document.querySelectorAll('a.refresh-button').forEach(function (btn) {
+              btn.addEventListener('click', function (e) {
+                  const el = e.currentTarget;
+                  const host_name_attr = el.attributes['data-host-name'];
+                  const service_name_attr = el.attributes['data-service-name'];
+                  console.log(host_name_attr.value);
+                  fetch('/runners/api/run-service-check', {
+                      method: 'POST',
+                      cache: 'no-cache',
+                      credentials: 'same-origin',
+                      headers: {
+                        'Content-Type': 'application/json'
+                      },
+                      redirect: 'follow',
+                      body: JSON.stringify({
+                          host_name: host_name_attr.value,
+                          service_name: service_name_attr.value
+                      })
+                  })
+                      .then(response => response.json())
+                      .then(data => console.log(data));
+              })
+          });
+      });
+    </script>
+{% endblock javascript %}
