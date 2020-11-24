@@ -1,7 +1,0 @@
-host:
-  name: srv-dev-001.local.domain
-  address: 127.0.0.1
-  contacts:
-    groups:
-    - 'admins'
-    - 'team_watch'

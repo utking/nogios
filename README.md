@@ -7,6 +7,7 @@ An attempt to create a Nagios-like health-check system
 
 * Python3 (with pip, setuptools, wheel)
 * MySQL for storing the database, if MySQL engine is used (with mysql-client)
+* Windows users need to have JSON1 extension installed to be able to work with Json fields in SQLite (https://stackoverflow.com/questions/62637458/django-3-1-fields-e180-sqlite-does-not-support-jsonfields#answers-header)
 * Docker and docker-compose for running development using Docker
 * Dev packages for Python3 and MySQL, for installing MySQL Python modules (python-dev, libmysqlclient-dev)
 * NodeJs and NPM for VueJs-based Web interface
@@ -20,6 +21,7 @@ sudo apt install mysql-client python3-pip python3-setuptools python3-dev libmysq
 pip3 install wheel
 pip3 install -r requirements.txt
 cp ./nogios/settings.example.py ./nogios/settings.py    # and adjust what needed to be adjusted
+cp -R ./conf.d.example ./conf.d         # and create config files as required
 python3 manage.py check                 # to check the application
 python3 manage.py migrate               # to apply DB migrations
 python3 manage.py loaddata fixtures/*   # to load initial data
@@ -30,6 +32,7 @@ python3 manage.py runserver             # to start a dev server
 ### Commands
 
 ```bash
+cp -R ./conf.d.example ./conf.d         # and create config files as required
 cp ./nogios/settings.example.py ./nogios/settings.py    # and adjust what needed to be adjusted
 pip3 install wheel
 pip3 install -r requirements.txt
