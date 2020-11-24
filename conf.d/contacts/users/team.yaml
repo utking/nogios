@@ -1,8 +1,0 @@
-users:
-  - name: john.user
-    destination: john.user@fake.domain
-    channel: Email
-groups:
-  - name: team_watch
-    members:
-    - john.user

@@ -4,11 +4,11 @@ python:
   - "3.6"
   - "3.7"
   - "3.8"
+  - "3.9"
 install:
-#  - apt install sqlite
   - pip install -r requirements.txt
-# command to run tests
 script:
+  - cp -R conf.d.example conf.d
   - cp nogios/settings.example.py nogios/settings.py
   - python3 manage.py check
   - python3 manage.py test -v 2

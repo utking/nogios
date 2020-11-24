@@ -1,6 +1,0 @@
-host:
-  name: cassandra-1.local.domain
-  address: 10.10.1.15
-  contacts:
-    groups:
-      - admins
