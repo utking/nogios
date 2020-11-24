@@ -12,6 +12,7 @@
                 <th class="status-col">Status</th>
                 <th>Output</th>
                 <th class="datetime-col">Check Date/Time</th>
+                <th class="action-col">#</th>
             </tr>
         </thead>
         <tbody>
@@ -70,6 +71,13 @@
                     <span title="{{ item.output }}">{{ item.output | truncatechars:64 }}</span>
                 </td>
                 <td>{{ item.executed_at | date:"Y-m-d H:i:s" }}</td>
+                <td>
+                    <a class="refresh-button" data-host-name="{{ item.host_name }}" title="Re-check immediately">
+                        <span>
+                            <i class="fas fa-sync" aria-hidden="true"></i>
+                        </span>
+                    </a>
+                </td>
             </tr>
         {% endfor %}
         </tbody>
@@ -81,6 +89,9 @@
     <style>
         table th.id-col {
             width: 3em;
+        }
+        table th.action-col {
+            width: 2em;
         }
         table tr td.col-status-UP {
             /* background: #7FFF00; */
@@ -107,3 +118,31 @@
         }
     </style>
 {% endblock %}
+
+{% block javascript %}
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+          document.querySelectorAll('a.refresh-button').forEach(function (btn) {
+              btn.addEventListener('click', function (e) {
+                  const el = e.currentTarget;
+                  const host_name_attr = el.attributes['data-host-name'];
+                  console.log(host_name_attr.value);
+                  fetch('/runners/api/run-host-check', {
+                      method: 'POST',
+                      cache: 'no-cache',
+                      credentials: 'same-origin',
+                      headers: {
+                        'Content-Type': 'application/json'
+                      },
+                      redirect: 'follow',
+                      body: JSON.stringify({
+                          host_name: host_name_attr.value
+                      })
+                  })
+                      .then(response => response.json())
+                      .then(data => console.log(data));
+              })
+          });
+      });
+    </script>
+{% endblock javascript %}

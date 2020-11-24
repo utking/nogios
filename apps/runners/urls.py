@@ -18,7 +18,8 @@ from . import views
 
 
 urlpatterns = [
-    # path('', views.index, name='index'),
     path('run-checks', views.run_checks, name='run-checks'),
+    path('api/run-host-check', views.run_host_check, name='run-host-check'),
+    path('api/run-service-check', views.run_service_check, name='run-service-check'),
     path('cleanup-downtime', views.cleanup_downtime, name='cleanup-downtime'),
 ]
