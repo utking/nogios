@@ -1,0 +1,18 @@
+service:
+  name: 'check_es_port'
+  type: 'http'
+  command: check_http_resp_code
+  expects: 200
+  command_arguments:
+    - 'localhost:9200'
+  hosts: 'srv-dev-00\d.local.domain'
+  location: dc-3
+  contacts:
+    groups:
+      - 'admins'
+  tags:
+    - elastic-search
+    - dev
+  help_url: '/help/about/es-port'
+  action_url: '/help/actions/es-port'
+  monitoring_url: '/monitoring/es-port'

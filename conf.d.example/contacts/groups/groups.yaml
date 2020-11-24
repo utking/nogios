@@ -1,0 +1,5 @@
+groups:
+  - name: admins
+    members:
+      # - jira
+      - user.admin
