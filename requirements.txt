@@ -3,7 +3,7 @@ Django==3.1.13
 django-mysql
 django-crontab
 mysqlclient
-pyyaml~=5.3.1
+PyYAML>=5.4
 requests
 paramiko
 djangorestframework==3.12.2
