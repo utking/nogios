@@ -1,5 +1,5 @@
 wheel
-Django==3.2.15
+Django==3.2.16
 django-mysql
 django-crontab
 mysqlclient
